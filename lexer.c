@@ -12,6 +12,9 @@ void init_lexer(Lexer* lexer, const char* source) {
 }
 
 int is_symbol(char c) {
+    if (c == '\0') {
+        return 0;
+    }
     if(isalnum((unsigned char)c)) {
         return 1;
     }
