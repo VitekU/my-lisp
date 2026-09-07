@@ -5,6 +5,7 @@
 
 #include "helper.h"
 #include "lexer.h"
+#include "parser.h"
 
 #define REPL_BUFFER 8192
 const char *NAMES[] = {"T_LPAREN", "T_RPAREN", "T_STRING", "T_NUMBER", "T_SYMBOL", "T_EOF"};
@@ -47,6 +48,7 @@ int main(int argc, char **argv) {
 
     // REPL
     Lexer lexer;
+    Parser parser;
     while (1) {
         printf(">>> ");
         if (fgets(buffer, REPL_BUFFER, stdin) == NULL) {
@@ -54,13 +56,18 @@ int main(int argc, char **argv) {
         }
         buffer[strcspn(buffer, "\n")] = '\0';
         init_lexer(&lexer, buffer);
+        init_parser(&parser, &lexer);
 
+        parse_expression(&parser);
+
+        /*
         Token token;
         token = next_token(&lexer);
         while (token.type != T_EOF) {
             printf("%s, %s, %d, %d\n", token.value,  NAMES[token.type], token.line, token.column);
             token = next_token(&lexer);
         }
+        */
     }
 
     return 0;

@@ -35,6 +35,12 @@ Node *create_list() {
     return node;
 }
 
+Node *create_nil() {
+    Node *node = malloc(sizeof(Node));
+    node->type = N_NIL;
+    return node;
+}
+
 void add_to_list(Node* list, Node* element) {
     // reallocates the memory in case of the dynamic array being full
     if (list->list.count >= list->list.capacity) {
@@ -66,24 +72,24 @@ Node* parse_list(Parser* parser) {
     // move past the L_PAREN token
     parser_next(parser);
 
-    TokenType c_type = parser_curr(parser).type;
 
-    while (c_type != T_RPAREN && c_type != T_EOF) {
+    while (parser_curr(parser).type != T_RPAREN && parser_curr(parser).type != T_EOF) {
         add_to_list(list, parse_expression(parser));
     }
 
-    if (c_type != T_RPAREN) {
+    if (parser_curr(parser).type != T_RPAREN) {
         errx(1, "Syntax error, expected ')'\n");
     }
 
     // move past the R_PAREN token
     parser_next(parser);
+
     return list;
 }
 
 Node* parse_expression(Parser* parser) {
     Token token = parser_curr(parser);
-
+    //printf("%s\n", token.value);
     switch (token.type) {
         case (T_NUMBER):
             parser_next(parser);
@@ -94,8 +100,11 @@ Node* parse_expression(Parser* parser) {
         case (T_SYMBOL):
             parser_next(parser);
             return create_symbol(token.value);
-        case (T_LPAREN):
+        case (T_LPAREN): {
             return parse_list(parser);
+        }
+        case (T_EOF):
+            return create_nil();
         default:
             errx(1, "Unexpected token %s", token.value);
     }

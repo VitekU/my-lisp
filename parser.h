@@ -8,7 +8,8 @@ typedef enum {
     N_NUMBER,
     N_STRING,
     N_SYMBOL,
-    N_LIST
+    N_LIST,
+    N_NIL
 } NodeType;
 
 typedef struct Node {
@@ -38,6 +39,7 @@ Node* create_number(int n);
 Node* create_string(char* s);
 Node* create_symbol(char* s);
 Node* create_list();
+Node* create_nil();
 void add_to_list(Node* list, Node* element);
 
 Node* parse_expression(Parser* parser);
