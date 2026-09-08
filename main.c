@@ -6,6 +6,7 @@
 #include "helper.h"
 #include "lexer.h"
 #include "parser.h"
+#include "eval.h"
 
 #define REPL_BUFFER 8192
 const char *NAMES[] = {"T_LPAREN", "T_RPAREN", "T_STRING", "T_NUMBER", "T_SYMBOL", "T_EOF"};
@@ -58,7 +59,10 @@ int main(int argc, char **argv) {
         init_lexer(&lexer, buffer);
         init_parser(&parser, &lexer);
 
-        parse_expression(&parser);
+        Node  *root = parse_expression(&parser);
+        Value *result = eval(root);
+
+        print_result(result);
 
         /*
         Token token;

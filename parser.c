@@ -11,27 +11,25 @@ Node *create_number(int n) {
     node->type = N_NUMBER;
     node->number = n;
     return node;
-
 }
-
 Node *create_string(char *s) {
     Node *node = malloc(sizeof(Node));
     node->type = N_STRING;
-    node->string = s;
+    node->string = strdup(s);
     return node;
-};
+}
 Node *create_symbol(char *s) {
     Node *node = malloc(sizeof(Node));
     node->type = N_SYMBOL;
-    node->symbol = s;
+    node->symbol = strdup(s);
     return node;
-};
+}
 Node *create_list() {
     Node *node = malloc(sizeof(Node));
     node->type = N_LIST;
     node->list.count = 0;
     node->list.capacity = INIT_LIST_CAPACITY;
-    node->list.elements = malloc(sizeof(Node) * INIT_LIST_CAPACITY);
+    node->list.elements = malloc(sizeof(Node*) * INIT_LIST_CAPACITY);
     return node;
 }
 
@@ -45,7 +43,7 @@ void add_to_list(Node* list, Node* element) {
     // reallocates the memory in case of the dynamic array being full
     if (list->list.count >= list->list.capacity) {
         list->list.capacity *= 2;
-        list->list.elements = realloc(list->list.elements, sizeof(Node) * list->list.capacity);
+        list->list.elements = realloc(list->list.elements, sizeof(Node*) * list->list.capacity);
     }
 
     list->list.elements[list->list.count] = element;

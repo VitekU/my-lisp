@@ -13,3 +13,15 @@ FILE* create_file_ptr(const char *name) {
 	}
 	return fp;
 }
+
+void print_result(Value *value) {
+    if (value->type == V_STRING) {
+        printf("%s\n", value->string);
+    }
+    else if (value->type == V_NUMBER) {
+        printf("%d\n", value->number);
+    }
+    else {
+        printf("NIL\n");
+    }
+}
