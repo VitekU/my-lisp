@@ -61,9 +61,12 @@ int main(int argc, char **argv) {
         init_parser(&parser, &lexer);
 
         Node *root = parse_expression(&parser);
-        Value *result = eval(root, env);
 
-        print_result(result);
+        while (root->type != N_NIL) {
+            Value *result = eval(root, env);
+            print_result(result);
+            root = parse_expression(&parser);
+        }
 
         /*
         Token token;

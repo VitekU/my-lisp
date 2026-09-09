@@ -22,6 +22,6 @@ void print_result(Value *value) {
         printf("%d\n", value->number);
     }
     else {
-        printf("NIL\n");
+        //printf("NIL\n");
     }
 }
