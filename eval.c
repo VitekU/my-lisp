@@ -118,6 +118,51 @@ Value *eval(Node *node, Environment *env) {
                 return value_function(params, body, env);
             }
 
+            if (strcmp(keyword->symbol, "if") == 0) {
+                if (node->list.count < 3) {
+                    errx(1, "Error: %s needs atleast 2 arguments.", "if");
+                }
+                Value *condition = eval(node->list.elements[1], env);
+                int result = 0;
+                if (condition->type == V_NUMBER && condition->number == 1) {
+                    result = 1;
+                }
+                if (condition->type == V_STRING && strcmp(condition->string, "true") == 0) {
+                    result = 1;
+                }
+
+                if (result == 1) {
+                    return eval(node->list.elements[2], env);
+                }
+                else if (node->list.count > 3) {
+                    return eval(node->list.elements[3], env);
+                }
+                return value_nil();
+            }
+
+            if (strcmp(keyword->symbol, "==") == 0) {
+                if (node->list.count < 3) {
+                    errx(1, "Error: %s needs 2 arguments.", "==");
+                }
+                Value *arg1 = eval(node->list.elements[1], env);
+                Value *arg2 = eval(node->list.elements[2], env);
+
+                if (arg1->type != arg2->type) {
+                    errx(1, "Error: %s can't compare 2 different types.", "==");
+                }
+                if (arg1->type == V_NUMBER) {
+                    if (arg1->number == arg2->number) {
+                        return value_number(1);
+                    }
+                }
+                if (arg2->type == V_STRING) {
+                    if (strcmp(arg1->string, arg2->string) == 0) {
+                        return value_number(1);
+                    }
+                }
+                return value_number(0);
+            }
+
             if (strcmp(keyword->symbol, PLUS) == 0) {
                 int n = 0;
                 for (size_t i = 1; i < node->list.count; ++i) {
@@ -154,6 +199,7 @@ Value *eval(Node *node, Environment *env) {
                 }
                 return value_number(n);
             }
+
 
             Value *function_to_eval = eval(keyword, env);
             if (function_to_eval->type == V_FUNCTION) {
