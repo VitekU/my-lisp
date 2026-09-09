@@ -50,6 +50,7 @@ int main(int argc, char **argv) {
     // REPL
     Lexer lexer;
     Parser parser;
+    Environment *env = env_new(NULL);
     while (1) {
         printf(">>> ");
         if (fgets(buffer, REPL_BUFFER, stdin) == NULL) {
@@ -59,8 +60,8 @@ int main(int argc, char **argv) {
         init_lexer(&lexer, buffer);
         init_parser(&parser, &lexer);
 
-        Node  *root = parse_expression(&parser);
-        Value *result = eval(root);
+        Node *root = parse_expression(&parser);
+        Value *result = eval(root, env);
 
         print_result(result);
 

@@ -87,7 +87,7 @@ Node* parse_list(Parser* parser) {
 
 Node* parse_expression(Parser* parser) {
     Token token = parser_curr(parser);
-    //printf("%s\n", token.value);
+
     switch (token.type) {
         case (T_NUMBER):
             parser_next(parser);
