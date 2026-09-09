@@ -4,6 +4,14 @@
 
 #define INIT_ENV_CAPACITY 4
 
+#define DEF_KEY "def"
+#define FN_KEY "fn"
+#define PLUS "+"
+#define MINUS "-"
+#define DIVIDE "/"
+#define MULT "*"
+
+
 typedef struct Function Function;
 typedef struct Environment Environment;
 

@@ -90,35 +90,47 @@ Value *eval(Node *node, Environment *env) {
     }
 
     if (node->type == N_LIST) {
+        // checks for an empty list
+        if (node->list.count == 0) {
+            printf("Warning: empty list\n");
+            return value_nil();
+        }
+
         Node *keyword = node->list.elements[0];
 
         if (keyword->type == N_SYMBOL) {
-            if (strcmp(keyword->symbol, "def") == 0) {
+            if (strcmp(keyword->symbol, DEF_KEY) == 0) {
+                if (node->list.count < 3) {
+                    errx(1, "Error: %s needs 2 arguments.", DEF_KEY);
+                }
                 char *name = node->list.elements[1]->symbol;
                 Value *value = eval(node->list.elements[2], env);
                 set_variable(env, name, value);
                 return value;
             }
 
-            if (strcmp(keyword->symbol, "fn") == 0) {
+            if (strcmp(keyword->symbol, FN_KEY) == 0) {
+                if (node->list.count < 3) {
+                    errx(1, "Error: %s needs 2 arguments.", FN_KEY);
+                }
                 Node *params = node->list.elements[1];
                 Node *body = node->list.elements[2];
                 return value_function(params, body, env);
             }
 
-            if (strcmp(keyword->symbol, "+") == 0) {
+            if (strcmp(keyword->symbol, PLUS) == 0) {
                 int n = eval(node->list.elements[1], env)->number + eval(node->list.elements[2], env)->number;
                 return value_number(n);
             }
-            else if (strcmp(keyword->symbol, "-") == 0) {
+            else if (strcmp(keyword->symbol, MINUS) == 0) {
                 int n = eval(node->list.elements[1], env)->number - eval(node->list.elements[2], env)->number;
                 return value_number(n);
             }
-            else if (strcmp(keyword->symbol, "*") == 0) {
+            else if (strcmp(keyword->symbol, MULT) == 0) {
                 int n = eval(node->list.elements[1], env)->number * eval(node->list.elements[2], env)->number;
                 return value_number(n);
             }
-            else if (strcmp(keyword->symbol, "/") == 0) {
+            else if (strcmp(keyword->symbol, DIVIDE) == 0) {
                 int n = eval(node->list.elements[1], env)->number / eval(node->list.elements[2], env)->number;
                 return value_number(n);
             }
@@ -129,7 +141,7 @@ Value *eval(Node *node, Environment *env) {
 
                 Environment *fn_env = env_new(fn.env);
 
-                for (int i = 0; i < fn.params->list.count; ++i) {
+                for (size_t i = 0; i < fn.params->list.count; ++i) {
                     char *arg_name = fn.params->list.elements[i]->symbol;
                     Value * arg_value = eval(node->list.elements[i + 1], env);
                     set_variable(fn_env, arg_name, arg_value);
