@@ -119,19 +119,39 @@ Value *eval(Node *node, Environment *env) {
             }
 
             if (strcmp(keyword->symbol, PLUS) == 0) {
-                int n = eval(node->list.elements[1], env)->number + eval(node->list.elements[2], env)->number;
+                int n = 0;
+                for (size_t i = 1; i < node->list.count; ++i) {
+                    n += eval(node->list.elements[i], env)->number;
+                }
                 return value_number(n);
             }
             else if (strcmp(keyword->symbol, MINUS) == 0) {
-                int n = eval(node->list.elements[1], env)->number - eval(node->list.elements[2], env)->number;
+                int n = 0;
+                if (node->list.count < 2) {
+                    return value_number(n);
+                }
+                n = eval(node->list.elements[1], env)->number;
+                for (size_t i = 2; i < node->list.count; ++i) {
+                    n -= eval(node->list.elements[i], env)->number;
+                }
                 return value_number(n);
             }
             else if (strcmp(keyword->symbol, MULT) == 0) {
-                int n = eval(node->list.elements[1], env)->number * eval(node->list.elements[2], env)->number;
+                int n = 1;
+                for (size_t i = 1; i < node->list.count; ++i) {
+                    n *= eval(node->list.elements[i], env)->number;
+                }
                 return value_number(n);
             }
             else if (strcmp(keyword->symbol, DIVIDE) == 0) {
-                int n = eval(node->list.elements[1], env)->number / eval(node->list.elements[2], env)->number;
+                int n = 0;
+                if (node->list.count < 2) {
+                    return value_number(n);
+                }
+                n = eval(node->list.elements[1], env)->number;
+                for (size_t i = 2; i < node->list.count; ++i) {
+                    n /= eval(node->list.elements[i], env)->number;
+                }
                 return value_number(n);
             }
 
