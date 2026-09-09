@@ -67,15 +67,6 @@ int main(int argc, char **argv) {
             print_result(result);
             root = parse_expression(&parser);
         }
-
-        /*
-        Token token;
-        token = next_token(&lexer);
-        while (token.type != T_EOF) {
-            printf("%s, %s, %d, %d\n", token.value,  NAMES[token.type], token.line, token.column);
-            token = next_token(&lexer);
-        }
-        */
     }
 
     return 0;

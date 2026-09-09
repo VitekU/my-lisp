@@ -6,10 +6,14 @@
 
 #define DEF_KEY "def"
 #define FN_KEY "fn"
+#define IF_KEY "if"
 #define PLUS "+"
 #define MINUS "-"
 #define DIVIDE "/"
 #define MULT "*"
+#define EQUALS "=="
+#define GREATER_THAN ">"
+#define LESSER_THAN "<"
 
 
 typedef struct Function Function;
