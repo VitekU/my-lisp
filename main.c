@@ -36,13 +36,18 @@ int main(int argc, char **argv) {
         fclose(fp);
 
         Lexer lexer;
-        init_lexer(&lexer, buffer);
+        Parser parser;
+        Environment *env = env_new(NULL);
 
-        Token token;
-        token = next_token(&lexer);
-        while (token.type != T_EOF) {
-            printf("%s, %s, %d, %d\n", token.value,  NAMES[token.type], token.line, token.column);
-            token = next_token(&lexer);
+        init_lexer(&lexer, buffer);
+        init_parser(&parser, &lexer);
+
+        Node *root = parse_expression(&parser);
+
+        while (root->type != N_NIL) {
+            Value *result = eval(root, env);
+            print_result(result);
+            root = parse_expression(&parser);
         }
         return 0;
     }
