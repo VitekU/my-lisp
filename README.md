@@ -85,3 +85,80 @@ Below are listed the supported data types, primitives and builtin functions with
 ### Overview
 The interpreter logic is split into 3 steps. First the `Lexer` has to split the input text into a stream of `Tokens`. <br>
 These tokens are then piped into the `Parser` which builds an `AST` from them. The tree is then traversed recursively with the `eval` function that evaluates the expressions in the tree and finally returns a value that is printed to the output.
+
+The `eval` function also takes an `Environment` parameter that serves as a large dictionnary of symbols that are bound to their respective values.
+
+### Lexer
+
+The `Lexer` gets its input as a stream of chars `char*`. It then goes one character at a time and groups them into `Tokens` of different types - listed below. 
+
+```
+typedef enum {
+    T_LPAREN,
+    T_RPAREN,
+    T_STRING,
+    T_NUMBER,
+    T_SYMBOL,
+    T_EOF
+} TokenType;
+```
+
+### Parser
+
+The `Parser` takes the `Tokens` produced by the `Lexer` (the `Parser` struct actually takes the `Lexer` and then gets the `Token`s on demand as it does the parsing step - this is called lazy lexing I believe) and forms them into an abstract syntax tree. <br>This step is simpler in LISP compared to the other languages (like Python or C) because the program flow is directly tied to the nesting of the `list` type expressions. <br>
+This means, that the AST created is a structure that can be described as expressions of which the expressions of the type `list` are nested in other `list` expressions. We can imagine this as a list of list in a language like Python. <br>
+The result is an AST that consist of the `Node` structures that can either represent a `number`, `string`, `symbol` or a `list`, the latter of those contains more nested `Node` structs as described above.
+
+```
+typedef struct Node {
+    NodeType type;
+    union {
+        int number;
+        char* string;
+        char* symbol;
+        struct {
+            struct Node **elements;
+            size_t count;
+            size_t capacity;
+        } list;
+    };
+} Node;
+```
+
+The `parse_expression` function used for the parsing step returns the root of the AST which is then passed in the `eval` function.
+
+### Eval 
+
+The `eval` function takes the root of the AST and recursively evaluates the nested `Node` structures. Each expression evaluates to a `Value` type of the following structure.
+```
+typedef struct {
+    ValueType type;
+    union {
+        int number;
+        char *string;
+        Function fn;
+    };
+} Value;
+```
+The expressions of type `list` are evaluated based on their first argument. These are the primitive symbols and builtin functions as described in the table in this [section](#primitives-and-builtin-functions).
+When using the `def` keyword, the following arguement serves a key to the next expression that is evaluated. This key value pair is then registered in the current environment. 
+
+### Environment
+
+The `Environment` is a simple array of `Pairs` and a pointer to a parent environment. The lookup of keys is therefore done in linear time.
+```
+typedef struct Pair {
+    char *key;
+    Value *value;
+} Pair;
+
+struct Environment {
+    struct Environment *parent;
+    Pair *pairs;
+    size_t count;
+    size_t capacity;
+};
+```
+___
+My two primary sources of knowledge for this project were the book [Crafting Interpreters](https://craftinginterpreters.com) by Robert Nystrom
+and [this blogpost](https://zstix.io/posts/make-a-lisp-in-python/) by Zack.
