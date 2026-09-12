@@ -44,7 +44,7 @@ void add_to_list(Node* list, Node* element) {
     // reallocates the memory in case of the dynamic array being full
     if (list->list.count >= list->list.capacity) {
         list->list.capacity *= 2;
-        list->list.elements = realloc(list->list.elements, sizeof(Node*) * list->list.capacity);
+        list->list.elements = arena_allocate(sizeof(Node*) * list->list.capacity);
     }
 
     list->list.elements[list->list.count] = element;

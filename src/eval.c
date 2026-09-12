@@ -47,7 +47,7 @@ void set_variable(Environment *env, char *key, Value *val) {
 
     if (env->count >= env->capacity) {
         env->capacity *= 2;
-        env->pairs = realloc(env->pairs, sizeof(Pair) * env->capacity);
+        env->pairs = arena_allocate(sizeof(Pair) * env->capacity);
     }
 
     env->pairs[env->count].key = strdup(key);
