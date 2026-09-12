@@ -6,33 +6,34 @@
 #include <string.h>
 #include "eval.h"
 #include "parser.h"
+#include "arena.h"
 
 Value *value_number(int n) {
-    Value *value = malloc(sizeof(Value));
+    Value *value = arena_allocate(sizeof(Value));
     value->type = V_NUMBER;
     value->number = n;
     return value;
 }
 
 Value *value_string(char *s) {
-    Value *value = malloc(sizeof(Value));
+    Value *value = arena_allocate(sizeof(Value));
     value->type = V_STRING;
     value->string = s;
     return value;
 }
 
 Value *value_nil() {
-    Value *value = malloc(sizeof(Value));
+    Value *value = arena_allocate(sizeof(Value));
     value->type = V_NIL;
     return value;
 }
 
 Environment *env_new(Environment *parent) {
-    Environment *env = malloc(sizeof(Environment));
+    Environment *env = arena_allocate(sizeof(Environment));
     env->parent = parent;
     env->count = 0;
     env->capacity = 4;
-    env->pairs = malloc(sizeof(Pair) * INIT_ENV_CAPACITY);
+    env->pairs = arena_allocate(sizeof(Pair) * INIT_ENV_CAPACITY);
     return env;
 }
 
@@ -67,7 +68,7 @@ Value *get_variable(Environment *env, char *key) {
 }
 
 Value *value_function(Node *params, Node *body, Environment *env) {
-    Value *value = malloc(sizeof(Value));
+    Value *value = arena_allocate(sizeof(Value));
     value->type = V_FUNCTION;
     value->fn.params = params;
     value->fn.body = body;

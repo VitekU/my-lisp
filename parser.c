@@ -1,4 +1,5 @@
 #include "parser.h"
+#include "arena.h"
 #include "lexer.h"
 #include <ctype.h>
 #include <err.h>
@@ -7,34 +8,34 @@
 
 
 Node *create_number(int n) {
-    Node *node = malloc(sizeof(Node));
+    Node *node = arena_allocate(sizeof(Node));
     node->type = N_NUMBER;
     node->number = n;
     return node;
 }
 Node *create_string(char *s) {
-    Node *node = malloc(sizeof(Node));
+    Node *node = arena_allocate(sizeof(Node));
     node->type = N_STRING;
     node->string = strdup(s);
     return node;
 }
 Node *create_symbol(char *s) {
-    Node *node = malloc(sizeof(Node));
+    Node *node = arena_allocate(sizeof(Node));
     node->type = N_SYMBOL;
     node->symbol = strdup(s);
     return node;
 }
 Node *create_list() {
-    Node *node = malloc(sizeof(Node));
+    Node *node = arena_allocate(sizeof(Node));
     node->type = N_LIST;
     node->list.count = 0;
     node->list.capacity = INIT_LIST_CAPACITY;
-    node->list.elements = malloc(sizeof(Node*) * INIT_LIST_CAPACITY);
+    node->list.elements = arena_allocate(sizeof(Node*) * INIT_LIST_CAPACITY);
     return node;
 }
 
 Node *create_nil() {
-    Node *node = malloc(sizeof(Node));
+    Node *node = arena_allocate(sizeof(Node));
     node->type = N_NIL;
     return node;
 }

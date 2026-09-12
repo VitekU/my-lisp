@@ -7,6 +7,7 @@
 #include "lexer.h"
 #include "parser.h"
 #include "eval.h"
+#include "arena.h"
 
 #define REPL_BUFFER 8192
 const char *NAMES[] = {"T_LPAREN", "T_RPAREN", "T_STRING", "T_NUMBER", "T_SYMBOL", "T_EOF"};
@@ -35,6 +36,7 @@ int main(int argc, char **argv) {
         buffer[size] = '\0';
         fclose(fp);
 
+        init_arena(ARENA_SIZE);
         Lexer lexer;
         Parser parser;
         Environment *env = env_new(NULL);
@@ -49,10 +51,12 @@ int main(int argc, char **argv) {
             print_result(result);
             root = parse_expression(&parser);
         }
+        arena_free();
         return 0;
     }
 
     // REPL
+    init_arena(ARENA_SIZE);
     Lexer lexer;
     Parser parser;
     Environment *env = env_new(NULL);
@@ -62,6 +66,9 @@ int main(int argc, char **argv) {
             break;
         }
         buffer[strcspn(buffer, "\n")] = '\0';
+        if (strcmp(buffer, "!exit") == 0) {
+            break;
+        }
         init_lexer(&lexer, buffer);
         init_parser(&parser, &lexer);
 
@@ -74,5 +81,6 @@ int main(int argc, char **argv) {
         }
     }
 
+    arena_free();
     return 0;
 }
