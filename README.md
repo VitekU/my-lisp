@@ -5,11 +5,7 @@ This is my implementation of an interpreter for a simplified LISP dialect.
 ## Build and Usage
 
 ### Compilation
-Compile the interpreter with `gcc` or `clang`:
-
-```
-gcc main.c eval.c parser.c helper.c lexer.c -o mlsp
-```
+Create a build directory, `mkdir build`, and `cd` into it. Then run `cmake ..` and `make`. 
 
 ### Running the REPL
 Run `./mlsp` without arguments to enter the REPL  environment:
