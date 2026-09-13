@@ -160,7 +160,7 @@ struct Environment {
 
 ### Arena Allocator
 
-In my language the memory is managed with an *Arena allocator*. This means that the interpreter preallocates a buffer of given size (default is 4 MB) and from the memory is allocated from this buffer. When the program finishes running, that buffer is freed.  
+In my language the memory is managed with an *Arena allocator*. This means that the interpreter preallocates a buffer of given size (default is 4 MB) and the memory is then allocated from this buffer. When the program finishes running, that buffer is freed.  
 ___
 My two primary sources of knowledge for this project were the book [Crafting Interpreters](https://craftinginterpreters.com) by Robert Nystrom
 and [this blogpost](https://zstix.io/posts/make-a-lisp-in-python/) by Zack.
