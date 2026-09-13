@@ -67,7 +67,7 @@ Below are listed the supported data types, primitives and builtin functions with
 
 More code examples are located in the folder *examples*.
 
-### Recursive factorial 
+### Factorial 
 ```
 (def fact
     (fn (x)
