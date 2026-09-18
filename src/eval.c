@@ -87,7 +87,7 @@ Value *eval(Node *node, Environment *env) {
     }
 
     if (node->type == N_SYMBOL) {
-        return get_variable(env, node->symbol);
+        return get_variable(env, node->symbol.symbol);
     }
 
     if (node->type == N_LIST) {
@@ -100,153 +100,146 @@ Value *eval(Node *node, Environment *env) {
         Node *keyword = node->list.elements[0];
 
         if (keyword->type == N_SYMBOL) {
-            if (strcmp(keyword->symbol, DEF_KEY) == 0) {
-                if (node->list.count < 3) {
-                    errx(1, "Error: %s needs 2 arguments.", DEF_KEY);
-                }
-                char *name = node->list.elements[1]->symbol;
-                Value *value = eval(node->list.elements[2], env);
-                set_variable(env, name, value);
-                return value;
-            }
-
-            if (strcmp(keyword->symbol, FN_KEY) == 0) {
-                if (node->list.count < 3) {
-                    errx(1, "Error: %s needs 2 arguments.", FN_KEY);
-                }
-                Node *params = node->list.elements[1];
-                Node *body = node->list.elements[2];
-                return value_function(params, body, env);
-            }
-
-            if (strcmp(keyword->symbol, IF_KEY) == 0) {
-                if (node->list.count < 3) {
-                    errx(1, "Error: %s needs atleast 2 arguments.", IF_KEY);
-                }
-                Value *condition = eval(node->list.elements[1], env);
-                int result = 0;
-                if (condition->type == V_NUMBER && condition->number == 1) {
-                    result = 1;
-                }
-                if (condition->type == V_STRING && strcmp(condition->string, "true") == 0) {
-                    result = 1;
-                }
-
-                if (result == 1) {
-                    return eval(node->list.elements[2], env);
-                }
-                else if (node->list.count > 3) {
-                    return eval(node->list.elements[3], env);
-                }
-                return value_nil();
-            }
-
-            if (strcmp(keyword->symbol, EQUALS) == 0) {
-                if (node->list.count < 3) {
-                    errx(1, "Error: %s needs 2 arguments.", EQUALS);
-                }
-                Value *arg1 = eval(node->list.elements[1], env);
-                Value *arg2 = eval(node->list.elements[2], env);
-
-                if (arg1->type != arg2->type) {
-                    errx(1, "Error: %s can't compare 2 different types.", EQUALS);
-                }
-                if (arg1->type == V_NUMBER) {
-                    if (arg1->number == arg2->number) {
-                        return value_number(1);
+            switch (keyword->symbol.symbolID) {
+                case (S_DEF):
+                    if (node->list.count < 3) {
+                        errx(1, "Error: %s needs 2 arguments.", DEF_KEY);
                     }
-                }
-                if (arg2->type == V_STRING) {
-                    if (strcmp(arg1->string, arg2->string) == 0) {
-                        return value_number(1);
+                    char *name = node->list.elements[1]->symbol.symbol;
+                    Value *value = eval(node->list.elements[2], env);
+                    set_variable(env, name, value);
+                    return value;
+                case (S_FN):
+                    if (node->list.count < 3) {
+                        errx(1, "Error: %s needs 2 arguments.", FN_KEY);
                     }
-                }
-                return value_number(0);
-            }
-
-            if (strcmp(keyword->symbol, GREATER_THAN) == 0) {
-                if (node->list.count < 3) {
-                    errx(1, "Error: %s needs 2 arguments.", GREATER_THAN);
-                }
-                Value *arg1 = eval(node->list.elements[1], env);
-                Value *arg2 = eval(node->list.elements[2], env);
-
-                if (arg1->type != arg2->type) {
-                    errx(1, "Error: %s can't compare 2 different types.", GREATER_THAN);
-                }
-                if (arg1->type == V_NUMBER) {
-                    if (arg1->number > arg2->number) {
-                        return value_number(1);
+                    Node *params = node->list.elements[1];
+                    Node *body = node->list.elements[2];
+                    return value_function(params, body, env);
+                case (S_IF):
+                    if (node->list.count < 3) {
+                        errx(1, "Error: %s needs atleast 2 arguments.", IF_KEY);
                     }
-                }
-                if (arg2->type == V_STRING) {
-                    if (strcmp(arg1->string, arg2->string) > 0) {
-                        return value_number(1);
+                    Value *condition = eval(node->list.elements[1], env);
+                    int result = 0;
+                    if (condition->type == V_NUMBER && condition->number == 1) {
+                        result = 1;
                     }
-                }
-                return value_number(0);
-            }
-
-            if (strcmp(keyword->symbol, LESSER_THAN) == 0) {
-                if (node->list.count < 3) {
-                    errx(1, "Error: %s needs 2 arguments.", LESSER_THAN);
-                }
-                Value *arg1 = eval(node->list.elements[1], env);
-                Value *arg2 = eval(node->list.elements[2], env);
-
-                if (arg1->type != arg2->type) {
-                    errx(1, "Error: %s can't compare 2 different types.", LESSER_THAN);
-                }
-                if (arg1->type == V_NUMBER) {
-                    if (arg1->number < arg2->number) {
-                        return value_number(1);
+                    if (condition->type == V_STRING && strcmp(condition->string, "true") == 0) {
+                        result = 1;
                     }
-                }
-                if (arg2->type == V_STRING) {
-                    if (strcmp(arg1->string, arg2->string) < 0) {
-                        return value_number(1);
-                    }
-                }
-                return value_number(0);
-            }
 
-            if (strcmp(keyword->symbol, PLUS) == 0) {
-                int n = 0;
-                for (size_t i = 1; i < node->list.count; ++i) {
-                    n += eval(node->list.elements[i], env)->number;
+                    if (result == 1) {
+                        return eval(node->list.elements[2], env);
+                    }
+                    else if (node->list.count > 3) {
+                        return eval(node->list.elements[3], env);
+                    }
+                    return value_nil();
+                case (S_EQUALS):
+                    if (node->list.count < 3) {
+                        errx(1, "Error: %s needs 2 arguments.", EQUALS);
+                    }
+                    Value *arg1 = eval(node->list.elements[1], env);
+                    Value *arg2 = eval(node->list.elements[2], env);
+
+                    if (arg1->type != arg2->type) {
+                        errx(1, "Error: %s can't compare 2 different types.", EQUALS);
+                    }
+                    if (arg1->type == V_NUMBER) {
+                        if (arg1->number == arg2->number) {
+                            return value_number(1);
+                        }
+                    }
+                    if (arg2->type == V_STRING) {
+                        if (strcmp(arg1->string, arg2->string) == 0) {
+                            return value_number(1);
+                        }
+                    }
+                    return value_number(0);
+                case (S_GREATER_THAN): {
+                    if (node->list.count < 3) {
+                        errx(1, "Error: %s needs 2 arguments.", GREATER_THAN);
+                    }
+                    Value *arg1 = eval(node->list.elements[1], env);
+                    Value *arg2 = eval(node->list.elements[2], env);
+
+                    if (arg1->type != arg2->type) {
+                        errx(1, "Error: %s can't compare 2 different types.", GREATER_THAN);
+                    }
+                    if (arg1->type == V_NUMBER) {
+                        if (arg1->number > arg2->number) {
+                            return value_number(1);
+                        }
+                    }
+                    if (arg2->type == V_STRING) {
+                        if (strcmp(arg1->string, arg2->string) > 0) {
+                            return value_number(1);
+                        }
+                    }
+                    return value_number(0);
                 }
-                return value_number(n);
-            }
-            else if (strcmp(keyword->symbol, MINUS) == 0) {
-                int n = 0;
-                if (node->list.count < 2) {
+                case (S_LESSER_THAN): {
+                    if (node->list.count < 3) {
+                        errx(1, "Error: %s needs 2 arguments.", LESSER_THAN);
+                    }
+                    Value *arg1 = eval(node->list.elements[1], env);
+                    Value *arg2 = eval(node->list.elements[2], env);
+
+                    if (arg1->type != arg2->type) {
+                        errx(1, "Error: %s can't compare 2 different types.", LESSER_THAN);
+                    }
+                    if (arg1->type == V_NUMBER) {
+                        if (arg1->number < arg2->number) {
+                            return value_number(1);
+                        }
+                    }
+                    if (arg2->type == V_STRING) {
+                        if (strcmp(arg1->string, arg2->string) < 0) {
+                            return value_number(1);
+                        }
+                    }
+                    return value_number(0);
+                }
+                case (S_PLUS): {
+                    int n = 0;
+                    for (size_t i = 1; i < node->list.count; ++i) {
+                        n += eval(node->list.elements[i], env)->number;
+                    }
                     return value_number(n);
                 }
-                n = eval(node->list.elements[1], env)->number;
-                for (size_t i = 2; i < node->list.count; ++i) {
-                    n -= eval(node->list.elements[i], env)->number;
-                }
-                return value_number(n);
-            }
-            else if (strcmp(keyword->symbol, MULT) == 0) {
-                int n = 1;
-                for (size_t i = 1; i < node->list.count; ++i) {
-                    n *= eval(node->list.elements[i], env)->number;
-                }
-                return value_number(n);
-            }
-            else if (strcmp(keyword->symbol, DIVIDE) == 0) {
-                int n = 0;
-                if (node->list.count < 2) {
+                case (S_MINUS): {
+                    int n = 0;
+                    if (node->list.count < 2) {
+                        return value_number(n);
+                    }
+                    n = eval(node->list.elements[1], env)->number;
+                    for (size_t i = 2; i < node->list.count; ++i) {
+                        n -= eval(node->list.elements[i], env)->number;
+                    }
                     return value_number(n);
                 }
-                n = eval(node->list.elements[1], env)->number;
-                for (size_t i = 2; i < node->list.count; ++i) {
-                    n /= eval(node->list.elements[i], env)->number;
+                case (S_MULT): {
+                    int n = 1;
+                    for (size_t i = 1; i < node->list.count; ++i) {
+                        n *= eval(node->list.elements[i], env)->number;
+                    }
+                    return value_number(n);
                 }
-                return value_number(n);
+                case (S_DIVIDE): {
+                    int n = 0;
+                    if (node->list.count < 2) {
+                        return value_number(n);
+                    }
+                    n = eval(node->list.elements[1], env)->number;
+                    for (size_t i = 2; i < node->list.count; ++i) {
+                        n /= eval(node->list.elements[i], env)->number;
+                    }
+                    return value_number(n);
+                }
+                default:
+                    break;
             }
-
 
             Value *function_to_eval = eval(keyword, env);
             if (function_to_eval->type == V_FUNCTION) {
@@ -255,7 +248,7 @@ Value *eval(Node *node, Environment *env) {
                 Environment *fn_env = env_new(fn.env);
 
                 for (size_t i = 0; i < fn.params->list.count; ++i) {
-                    char *arg_name = fn.params->list.elements[i]->symbol;
+                    char *arg_name = fn.params->list.elements[i]->symbol.symbol;
                     Value * arg_value = eval(node->list.elements[i + 1], env);
                     set_variable(fn_env, arg_name, arg_value);
                 }

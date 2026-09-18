@@ -4,6 +4,17 @@
 
 #define INIT_LIST_CAPACITY 4
 
+#define DEF_KEY "def"
+#define FN_KEY "fn"
+#define IF_KEY "if"
+#define PLUS "+"
+#define MINUS "-"
+#define DIVIDE "/"
+#define MULT "*"
+#define EQUALS "=="
+#define GREATER_THAN ">"
+#define LESSER_THAN "<"
+
 typedef enum {
     N_NUMBER,
     N_STRING,
@@ -12,12 +23,28 @@ typedef enum {
     N_NIL
 } NodeType;
 
+typedef enum {
+    S_DEF,
+    S_FN,
+    S_IF,
+    S_PLUS,
+    S_MINUS,
+    S_DIVIDE,
+    S_MULT,
+    S_EQUALS,
+    S_GREATER_THAN,
+    S_LESSER_THAN
+} SymbolID;
+
 typedef struct Node {
     NodeType type;
     union {
         int number;
         char* string;
-        char* symbol;
+        struct {
+            char* symbol;
+            SymbolID symbolID;
+        } symbol;
         struct {
             struct Node **elements;
             size_t count;
