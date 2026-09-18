@@ -1,6 +1,7 @@
 #include "parser.h"
 #include "arena.h"
 #include "lexer.h"
+#include <_string.h>
 #include <ctype.h>
 #include <err.h>
 #include <stdlib.h>
@@ -22,7 +23,45 @@ Node *create_string(char *s) {
 Node *create_symbol(char *s) {
     Node *node = arena_allocate(sizeof(Node));
     node->type = N_SYMBOL;
-    node->symbol = strdup(s);
+
+    SymbolID symbolID;
+
+    if (strcmp(s, DEF_KEY) == 0) {
+        symbolID = S_DEF;
+    }
+    else if (strcmp(s, FN_KEY) == 0) {
+        symbolID = S_FN;
+    }
+    else if (strcmp(s, IF_KEY) == 0) {
+        symbolID = S_IF;
+    }
+    else if (strcmp(s, PLUS) == 0) {
+        symbolID = S_PLUS;
+    }
+    else if (strcmp(s, MINUS) == 0) {
+        symbolID = S_MINUS;
+    }
+    else if (strcmp(s, MULT) == 0) {
+        symbolID = S_MULT;
+    }
+    else if (strcmp(s, DIVIDE) == 0) {
+        symbolID = S_DIVIDE;
+    }
+    else if (strcmp(s, EQUALS) == 0) {
+        symbolID = S_EQUALS;
+    }
+    else if (strcmp(s, GREATER_THAN) == 0) {
+        symbolID = S_GREATER_THAN;
+    }
+    else if (strcmp(s, LESSER_THAN) == 0) {
+        symbolID = S_LESSER_THAN;
+    }
+    else {
+        symbolID = -1;
+    }
+
+    node->symbol.symbol = strdup(s);
+    node->symbol.symbolID = symbolID;
     return node;
 }
 Node *create_list() {
